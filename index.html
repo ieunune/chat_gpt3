@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Chat</title>
+</head>
+
+<body>
+
+  <style>
+    .chat-content { height: 350px; overflow-y: scroll;}
+    .line { margin-top: 10px; display: flex;}
+    .chat-box {background: #eee; padding: 5px; max-width: 200px;}
+    .mine {margin-left: auto;}
+  </style>
+
+  <form>
+      <div class="chat-content">
+          <div class="line">
+            <span class="chat-box">안녕?</span>
+          </div>
+          <div class="line">
+            <span class="chat-box mine">안녕!</span>
+          </div>
+      </div>
+      
+      <input class="chat-box" id="input">
+      <button type="submit" id="send">전송</button>
+  </form>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios@1.1.3/dist/axios.min.js"></script>
+  <script type="module">
+
+    document.querySelector('form').addEventListener('submit', (e)=>{
+        e.preventDefault();
+    });
+
+    // import { Configuration, OpenAIApi } from 'https://cdn.skypack.dev/openai';
+
+    document.querySelector('#send').addEventListener('click', function(){
+      
+      let template1 = `<div class="line">
+        <div class="chat-box mine">
+          ${document.querySelector('#input').value}
+        </div>
+      </div>`;
+      document.querySelector('.chat-content').insertAdjacentHTML('beforeend',  template1);
+      // 스크롤 제일 아래로 내리기
+      var rootDiv = document.querySelector('.chat-content');
+      rootDiv.scrollTop = rootDiv.scrollHeight;
+
+      let q = 'http://localhost:3000/translate?q=' + document.querySelector('#input').value;
+      axios.get(q).then(r => {
+
+        var 결과 = JSON.parse(r.data).message.result.translatedText;
+        console.log(결과);
+
+        let template2 = `<div class="line">
+          <div class="chat-box">${결과}</div>
+        </div>`;
+        document.querySelector('.chat-content').insertAdjacentHTML('beforeend', template2);
+        
+        // 스크롤 내리기
+        rootDiv.scrollTop = rootDiv.scrollHeight;
+
+      }).catch((error)=>{console.log('실패',error)})
+
+      // var template = `<div class="line">
+      //   <span class="chat-box mine">${ document.querySelector('#input').value }</span>
+      // </div>`
+      // document.querySelector('.chat-content').insertAdjacentHTML('beforeend', template);
+      // // 스크롤 제일 아래로 내리기
+      // var rootDiv = document.querySelector('.chat-content');
+      // rootDiv.scrollTop = rootDiv.scrollHeight;
+      // // 텍스트 비우기
+      // document.querySelector('#input').value = '';
+      
+      
+      // const configuration = new Configuration({
+      //   apiKey: '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',
+      // });
+      // const openai = new OpenAIApi(configuration);
+
+      // openai.createCompletion({
+      //   model: "text-davinci-002",
+      //   prompt: document.querySelector('#input').value,
+      //   temperature: 0.7,
+      //   max_tokens: 256,
+      //   top_p: 1,
+      //   frequency_penalty: 0,
+      //   presence_penalty: 0,
+      // }).then((result)=>{
+      //   // console.log(result.data.choices[0].text)
+      //   var template = `<div class="line">
+      //     <span class="chat-box">${ result.data.choices[0].text }</span>
+      //   </div>`
+      //   document.querySelector('.chat-content').insertAdjacentHTML('beforeend', template);
+
+      //   // 스크롤 젤 아래로 내리기
+      //   rootDiv.scrollTop = rootDiv.scrollHeight;
+      // })
+
+    })
+  </script>
+
+</body>
+</html>
